@@ -52,6 +52,10 @@
   }
 }
 
+aside::-webkit-scrollbar {
+  display: none;
+}
+
 html {
   font-family: 'Nunito Sans', 'sans-serif', -apple-system, BlinkMacSystemFont, 'Segoe UI',
     'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
