@@ -9,7 +9,7 @@
     "start": "node index",
     "build": "cd client/ && npm run build",
     "re-install": "npm run delete-modules && npm install",
-    "delete-modules": "rmdir node_modules /s /q"
+    "delete-modules": "rmdir /s /q node_modules"
   },
   "author": "Muhammad Akhyar",
   "license": "ISC",

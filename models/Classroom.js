@@ -7,7 +7,7 @@ const classroomSchema = new Schema(
       type: String,
       required: true,
       trim: true,
-      maxLength: [15, 'Panjang maksimal 15 karakter'],
+      maxLength: [25, 'Panjang maksimal 25 karakter'],
       match: [/^[a-zA-Z0-9\s]*$/, 'Data tidak benar (hanya huruf dan angka)'],
       validate: {
         validator: async function (value) {

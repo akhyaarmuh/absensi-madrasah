@@ -24,6 +24,7 @@ export const getAllStudent = async (req, res) => {
   if (query.classroom) queries.classroom = query.classroom;
   if (query.full_name) queries.full_name = new RegExp(query.full_name, 'i');
   if (query.no_induk) queries.no_induk = query.no_induk;
+  if (query.status) queries.status = query.status;
 
   try {
     let data = await Student.find(queries).exec();

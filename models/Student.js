@@ -56,8 +56,9 @@ const studentSchema = new Schema(
       trim: true,
     },
     status: {
-      type: Number,
-      default: 1,
+      type: String,
+      default: 'aktif',
+      enum: ['aktif', 'berhenti', 'lulus'],
     },
     image: {
       type: String,

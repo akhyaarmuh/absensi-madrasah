@@ -1,4 +1,6 @@
 import Swal from 'sweetalert2';
+import Select from 'react-select';
+import { useSelector } from 'react-redux';
 import { ImBoxAdd } from 'react-icons/im';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -6,13 +8,19 @@ import { BsArrowLeftShort, BsArrowRightShort } from 'react-icons/bs';
 
 import { toRupiah } from '../../utilities';
 import { Breadcrumbs, Button } from '../../components';
-import dummyProfile from '../../assets/images/profile.jpg';
+// import dummyProfile from '../../assets/images/profile.jpg';
 import { getAllStudent, deleteStudentById } from '../../fetchers/student';
 
 const breadList = [{ title: 'Beranda', href: '/' }, { title: 'Santri' }];
+const status = [
+  { value: 'aktif', label: 'Aktif' },
+  { value: 'berhenti', label: 'Berhenti' },
+  { value: 'lulus', label: 'Lulus' },
+];
 
 const Student = () => {
   const navigate = useNavigate();
+  const classrooms = useSelector((state) => state.classroom.data);
   const [student, setStudent] = useState({
     data: [],
     page: 0,
@@ -22,6 +30,7 @@ const Student = () => {
   });
   const [queries, setQueries] = useState({
     classroom: '',
+    status: 'aktif',
     full_name: '',
     no_induk: '',
     page: 0,
@@ -135,7 +144,37 @@ const Student = () => {
               </th>
 
               <th></th>
-              <th></th>
+              {/* <th></th> */}
+
+              <th className="min-w-[170px] pr-4">
+                <Select
+                  className="my-react-select-container"
+                  classNamePrefix="my-react-select"
+                  menuPosition="fixed"
+                  placeholder="Semua kelas..."
+                  name="classroom"
+                  isClearable
+                  options={classrooms}
+                  onChange={(e) =>
+                    setQueries({ ...queries, classroom: e?.value || '', page: 0 })
+                  }
+                />
+              </th>
+              <th className="min-w-[180px] pr-4">
+                <Select
+                  className="my-react-select-container"
+                  classNamePrefix="my-react-select"
+                  menuPosition="fixed"
+                  placeholder="Semua status..."
+                  defaultValue={{ value: 'aktif', label: 'Aktif' }}
+                  name="status"
+                  isClearable
+                  options={status}
+                  onChange={(e) =>
+                    setQueries({ ...queries, status: e?.value || '', page: 0 })
+                  }
+                />
+              </th>
               <th></th>
             </tr>
 
@@ -143,7 +182,9 @@ const Student = () => {
               <th className="whitespace-nowrap px-6 py-3">NIS</th>
               <th className="whitespace-nowrap px-6">Nama Lengkap</th>
               <th className="whitespace-nowrap px-6">Nama Orangtua</th>
-              <th className="whitespace-nowrap px-6">Gambar</th>
+              {/* <th className="whitespace-nowrap px-6">Gambar</th> */}
+              <th className="whitespace-nowrap px-6">Kelas</th>
+              <th className="whitespace-nowrap px-6">Status</th>
               <th className="whitespace-nowrap px-6"></th>
             </tr>
           </thead>
@@ -176,13 +217,15 @@ const Student = () => {
                   {student.full_name}
                 </td>
                 <td className="whitespace-nowrap px-6">{student.parent_name}</td>
-                <td className="whitespace-nowrap px-6">
+                {/* <td className="whitespace-nowrap px-6">
                   <img
                     className="h-6 w-6 object-cover "
                     src={student.image ? `${getUrl()}/${student.image}` : dummyProfile}
                     alt="profile"
                   />
-                </td>
+                </td> */}
+                <td className="whitespace-nowrap px-6">{student.classroom.name}</td>
+                <td className="whitespace-nowrap px-6">{student.status}</td>
                 <td className="whitespace-nowrap px-6 text-right">
                   <Button
                     label="Ubah"
