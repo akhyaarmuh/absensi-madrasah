@@ -58,7 +58,7 @@ export const updateClassroomById = async (req, res) => {
     if (error.name === 'ValidationError')
       res.status(400).json({
         message: error.message || 'Data tidak benar',
-        error: formatterErrorValidation(error),
+        error: errorValidation(error),
       });
     else res.status(500).json({ message: error.message || 'Server error', error });
   }
