@@ -8,6 +8,12 @@ import { Breadcrumbs, Input, Button } from '../../components';
 
 import { createStudent, updateStudentById } from '../../fetchers/student';
 
+const status = [
+  { value: 'aktif', label: 'aktif' },
+  { value: 'berhenti', label: 'berhenti' },
+  { value: 'lulus', label: 'lulus' },
+];
+
 const forms = [
   {
     type: 'text',
@@ -78,6 +84,7 @@ const Form = (props) => {
   const classrooms = useSelector((state) => state.classroom.data);
   const [gender, setGender] = useState([]);
   const [classroom, setClassroom] = useState([]);
+  const [defaultStatus, setDefaultStatus] = useState([]);
   const [payload, setPayload] = useState({
     no_induk: '',
     full_name: '',
@@ -86,6 +93,7 @@ const Form = (props) => {
     gender: '',
     address: '',
     classroom: '',
+    status: '',
   });
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState({
@@ -96,6 +104,7 @@ const Form = (props) => {
     gender: '',
     address: '',
     classroom: '',
+    status: '',
   });
 
   useEffect(() => {
@@ -114,6 +123,10 @@ const Form = (props) => {
       setClassroom({
         value: location.state.classroom._id,
         label: location.state.classroom.name,
+      });
+      setDefaultStatus({
+        value: location.state.status,
+        label: location.state.status,
       });
     }
   }, [type, location, navigate]);
@@ -211,6 +224,24 @@ const Form = (props) => {
               />
             );
           })}
+
+          {type === 'update' && (
+            <Input
+              type="select"
+              label="Status"
+              placeholder="Status saat ini"
+              disabled={saving}
+              name="status"
+              value={defaultStatus}
+              errorMessage={error.status}
+              options={status}
+              onChange={(e) => {
+                setDefaultStatus(e);
+                setPayload({ ...payload, status: e.value });
+                setError({ ...error, status: '' });
+              }}
+            />
+          )}
         </div>
         <div className="h-5"></div>
         <Button
