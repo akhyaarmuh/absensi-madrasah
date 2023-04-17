@@ -93,7 +93,7 @@ const Form = (props) => {
     gender: '',
     address: '',
     classroom: '',
-    status: '',
+    status: 'aktif',
   });
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState({
