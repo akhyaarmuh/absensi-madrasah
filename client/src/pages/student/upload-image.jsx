@@ -6,7 +6,7 @@ import { uploadProfile, deleteProfile } from '../../fetchers/image';
 
 const breadList = [
   { title: 'Beranda', href: '/' },
-  { title: 'Santri', href: '/student' },
+  { title: 'Santri', href: -2 },
   { title: 'Upload gambar' },
 ];
 
@@ -41,7 +41,7 @@ const UploadImage = () => {
       await uploadProfile(location.state._id, formData);
 
       if (location.state.from === 'create') navigate('/student/create');
-      else navigate('/student');
+      else navigate(-2);
     } catch (error) {
       if (error.response.status === 400)
         setErrorMessage({ ...errorMessage, ...error.response.data.error });

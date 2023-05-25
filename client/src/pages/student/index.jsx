@@ -3,7 +3,7 @@ import Select from 'react-select';
 import { useSelector } from 'react-redux';
 import { ImBoxAdd } from 'react-icons/im';
 import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { BsArrowLeftShort, BsArrowRightShort } from 'react-icons/bs';
 
 import { toRupiah } from '../../utilities';
@@ -20,6 +20,7 @@ const status = [
 
 const Student = () => {
   const navigate = useNavigate();
+  const [params, setParams] = useSearchParams();
   const classrooms = useSelector((state) => state.classroom.data);
   const [student, setStudent] = useState({
     data: [],
@@ -29,11 +30,11 @@ const Student = () => {
     allPage: 0,
   });
   const [queries, setQueries] = useState({
-    classroom: '',
-    status: 'aktif',
-    full_name: '',
-    no_induk: '',
-    page: 0,
+    classroom: params.get('classroom') || '',
+    status: params.get('status') || 'aktif',
+    full_name: params.get('full_name') || '',
+    no_induk: params.get('no_induk') || '',
+    page: Number(params.get('page')) || 0,
     limit: 20,
     sort: 'full_name',
   });
@@ -52,7 +53,17 @@ const Student = () => {
       setGetting(false);
     };
 
+    for (const property in queries) {
+      if (queries[property]) {
+        params.set(property, queries[property]);
+      } else {
+        params.delete(property);
+      }
+    }
+    setParams(params);
+
     getAll();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [queries]);
 
   const changeInputQueries = (e) => {
@@ -129,6 +140,7 @@ const Student = () => {
                   placeholder="Masukkan NIS..."
                   name="no_induk"
                   autoComplete="off"
+                  defaultValue={queries.no_induk}
                   autoFocus
                   onKeyUp={changeInputQueries}
                 />
@@ -139,6 +151,7 @@ const Student = () => {
                   placeholder="Masukkan nama santri..."
                   name="full_name"
                   autoComplete="off"
+                  defaultValue={queries.full_name}
                   onKeyUp={changeInputQueries}
                 />
               </th>
@@ -155,6 +168,7 @@ const Student = () => {
                   name="classroom"
                   isClearable
                   options={classrooms}
+                  defaultValue={classrooms.find((c) => c.value === queries.classroom)}
                   onChange={(e) =>
                     setQueries({ ...queries, classroom: e?.value || '', page: 0 })
                   }
@@ -166,7 +180,7 @@ const Student = () => {
                   classNamePrefix="my-react-select"
                   menuPosition="fixed"
                   placeholder="Semua status..."
-                  defaultValue={{ value: 'aktif', label: 'Aktif' }}
+                  defaultValue={status.find((s) => s.value === queries.status)}
                   name="status"
                   isClearable
                   options={status}

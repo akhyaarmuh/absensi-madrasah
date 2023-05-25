@@ -9,7 +9,7 @@ import { Breadcrumbs } from '../../components';
 
 const breadList = [
   { title: 'Beranda', href: '/' },
-  { title: 'Santri', href: '/student' },
+  { title: 'Santri', href: -1 },
   { title: 'Detail Santri' },
 ];
 const displayBirth = (date) => {

@@ -148,7 +148,7 @@ const Form = (props) => {
     try {
       if (type === 'update') {
         await updateStudentById(payload);
-        navigate('/student');
+        navigate(-1);
       } else {
         const newStudent = await createStudent(payload);
         Swal.fire({
