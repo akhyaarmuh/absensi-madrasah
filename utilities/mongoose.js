@@ -3,8 +3,8 @@ import fs from 'fs';
 import Absent_Detail from '../models/Absent_Detail.js';
 import Absent from '../models/Absent.js';
 import Classroom from '../models/Classroom.js';
-import Student from '../models/Classroom.js';
-import Teacher from '../models/Classroom.js';
+import Student from '../models/Student.js';
+import Teacher from '../models/Teacher.js';
 import User from '../models/User.js';
 
 export const errorValidation = (error) => {

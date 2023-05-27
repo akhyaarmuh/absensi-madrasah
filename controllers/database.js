@@ -1,5 +1,10 @@
 import path from 'path';
 
+import Absent_Detail from '../models/Absent_Detail.js';
+import Absent from '../models/Absent.js';
+import Classroom from '../models/Classroom.js';
+import Student from '../models/Student.js';
+import Teacher from '../models/Teacher.js';
 import User from '../models/User.js';
 import { __dirname } from '../utilities/index.js';
 import { restoreDatabase, errorValidation } from '../utilities/mongoose.js';
@@ -30,6 +35,11 @@ export const restore = async (req, res) => {
     backup.mv(`${__dirname}/${fileName}`, async (error) => {
       if (error) throw error;
 
+      await Absent_Detail.collection.drop();
+      await Absent.collection.drop();
+      await Classroom.collection.drop();
+      await Student.collection.drop();
+      await Teacher.collection.drop();
       await User.collection.drop();
 
       await restoreDatabase();
