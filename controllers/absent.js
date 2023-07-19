@@ -139,6 +139,7 @@ export const getUserAbsent = async (req, res) => {
         {
           $match: {
             'absences.status': { $ne: 'hadir' },
+            status: 'aktif',
           },
         },
         {

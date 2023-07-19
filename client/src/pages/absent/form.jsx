@@ -147,11 +147,11 @@ const Form = ({ role }) => {
               <span className="mr-2">:</span>
               <span>{student.full_name}</span>
             </p>
-            <p className="flex text-base text-neutral-600 dark:text-neutral-200">
+            {/* <p className="flex text-base text-neutral-600 dark:text-neutral-200">
               <span className="inline-block w-[105px]">Bin/Binti</span>
               <span className="mr-2">:</span>
               <span>{student.parent_name}</span>
-            </p>
+            </p> */}
             <p className="flex text-base text-neutral-600 dark:text-neutral-200">
               <span className="inline-block w-[105px]">Kelamin</span>
               <span className="mr-2">:</span>
