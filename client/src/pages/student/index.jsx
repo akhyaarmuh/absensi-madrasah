@@ -21,6 +21,10 @@ const status = [
 const Student = () => {
   const navigate = useNavigate();
   const [params, setParams] = useSearchParams();
+  const genders = [
+    { value: 'laki-laki', label: 'Laki-laki' },
+    { value: 'perempuan', label: 'Perempuan' },
+  ];
   const classrooms = useSelector((state) => state.classroom.data);
   const [student, setStudent] = useState({
     data: [],
@@ -29,10 +33,12 @@ const Student = () => {
     rows: 0,
     allPage: 0,
   });
+
   const [queries, setQueries] = useState({
     classroom: params.get('classroom') || '',
     status: params.get('status') || 'aktif',
     full_name: params.get('full_name') || '',
+    gender: params.get('gender') || '',
     no_induk: params.get('no_induk') || '',
     page: Number(params.get('page')) || 0,
     limit: 20,
@@ -156,7 +162,22 @@ const Student = () => {
                 />
               </th>
 
-              <th></th>
+              {/* <th className="min-w-[170px] pr-4"> */}
+              <th className="min-w-[188px] pr-4">
+                <Select
+                  className="my-react-select-container"
+                  classNamePrefix="my-react-select"
+                  menuPosition="fixed"
+                  placeholder="Kelamin..."
+                  name="gender"
+                  isClearable
+                  options={genders}
+                  defaultValue={genders.find((g) => g.value === queries.gender)}
+                  onChange={(e) =>
+                    setQueries({ ...queries, gender: e?.value || '', page: 0 })
+                  }
+                />
+              </th>
               {/* <th></th> */}
 
               <th className="min-w-[170px] pr-4">
@@ -174,7 +195,7 @@ const Student = () => {
                   }
                 />
               </th>
-              <th className="min-w-[180px] pr-4">
+              <th className="min-w-[177px] pr-4">
                 <Select
                   className="my-react-select-container"
                   classNamePrefix="my-react-select"
@@ -238,7 +259,9 @@ const Student = () => {
                     alt="profile"
                   />
                 </td> */}
-                <td className="whitespace-nowrap px-6">{student.classroom.name}</td>
+                <td className="whitespace-nowrap px-6">
+                  {student.status === 'aktif' ? student.classroom.name : ''}
+                </td>
                 <td className="whitespace-nowrap px-6">{student.status}</td>
                 <td className="whitespace-nowrap px-6 text-right">
                   <Button

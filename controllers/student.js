@@ -21,6 +21,7 @@ export const getAllStudent = async (req, res) => {
   const url = `${req.protocol}://${req.get('host')}/images`;
   const { page = 0, limit = 0, sort = '', ...query } = req.query;
   const queries = {};
+  if (query.gender) queries.gender = query.gender;
   if (query.classroom) queries.classroom = query.classroom;
   if (query.full_name) queries.full_name = new RegExp(query.full_name, 'i');
   if (query.no_induk) queries.no_induk = query.no_induk;
