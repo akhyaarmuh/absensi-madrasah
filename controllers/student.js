@@ -1,4 +1,6 @@
+import Absent from '../models/Absent.js';
 import Student from '../models/Student.js';
+import Absent_Detail from '../models/Absent_Detail.js';
 import { errorValidation } from '../utilities/mongoose.js';
 
 export const createStudent = async (req, res) => {
@@ -60,6 +62,29 @@ export const getStudentById = async (req, res) => {
     student.url = url;
 
     res.json({ data: student });
+  } catch (error) {
+    res.status(500).json({ message: error.message || 'Server error', error });
+  }
+};
+
+export const getDetailAbsentStudentById = async (req, res) => {
+  let tidakHadir = [];
+  const { id: idStudent } = req.params;
+
+  try {
+    const allAbsent = await Absent.find().sort('created_at').exec();
+
+    for (const absent of allAbsent) {
+      const hadir = await Absent_Detail.findOne({
+        id_absent: absent._id.toString(),
+        id_student: idStudent,
+      });
+
+      if (!hadir || hadir.status !== 'hadir')
+        tidakHadir.push({ ...absent._doc, status: hadir?.status || 'tidak hadir' });
+    }
+
+    res.json({ data: tidakHadir });
   } catch (error) {
     res.status(500).json({ message: error.message || 'Server error', error });
   }

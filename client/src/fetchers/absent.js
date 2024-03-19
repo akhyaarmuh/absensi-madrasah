@@ -29,6 +29,14 @@ export const getUserAbsent = async (id_absent, queries) => {
   return response.data;
 };
 
+export const updateAbsentDetailStudent = async (id_absent, payload) => {
+  const response = await axiosWT.patch(
+    `${rootPath}/detail/${id_absent}/student`,
+    payload
+  );
+  return response.data;
+};
+
 export const updateAbsentDetailByNoInduk = async (id_absent, payload) => {
   const response = await axiosWT.patch(`${rootPath}/detail/${id_absent}`, payload);
   return response.data.data;

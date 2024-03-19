@@ -4,8 +4,9 @@ import { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 
 import { parseDate } from '../../utilities';
-import dummyProfile from '../../assets/images/profile.jpg';
 import { Breadcrumbs } from '../../components';
+import dummyProfile from '../../assets/images/profile.jpg';
+import { getDetailAbsentStudentById } from '../../fetchers/student';
 
 const breadList = [
   { title: 'Beranda', href: '/' },
@@ -19,14 +20,35 @@ const displayBirth = (date) => {
   return `${dateWithZero} ${monthString} ${year}`;
 };
 
+const displayDate = (date) => {
+  const { dateWithZero, monthString, year } = parseDate(date);
+  return `${dateWithZero} ${monthString} ${year}`;
+};
+
 const Detail = () => {
   const location = useLocation();
   const navigate = useNavigate();
+
+  const [getting, setGetting] = useState(true);
+  const [detailAbsent, setDetailAbsent] = useState([]);
   const [student, setStudent] = useState({ image: '' });
 
   useEffect(() => {
     if (!location.state) return navigate('/student');
     setStudent(location.state);
+
+    const getDetailAbsent = async () => {
+      try {
+        const data = await getDetailAbsentStudentById(location.state._id);
+        setDetailAbsent(data);
+      } catch (error) {
+        console.log(error);
+      }
+
+      setGetting(false);
+    };
+
+    getDetailAbsent();
   }, [location, navigate]);
 
   // const updateStatus = () => {
@@ -118,6 +140,15 @@ const Detail = () => {
           </div>
         </div>
       </div>
+
+      {/* detail absent */}
+      <h3 className="mt-3 text-xl">Detil Absen :</h3>
+      {getting && 'Silakan tunggu...'}
+      {detailAbsent.map((absent, i) => (
+        <p className="mt-3" key={i}>
+          {i + 1}. {displayDate(absent.date)} = {absent.status}
+        </p>
+      ))}
     </>
   );
 };

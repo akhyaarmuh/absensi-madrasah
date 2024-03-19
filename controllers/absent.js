@@ -203,6 +203,32 @@ export const getUserAbsent = async (req, res) => {
   }
 };
 
+export const updateAbsentDetailStudent = async (req, res) => {
+  const { id_absent } = req.params;
+  const { no_induk, status } = req.body;
+
+  try {
+    const student = await Student.findOne({ no_induk });
+    await Absent_Detail.deleteOne({ id_absent, id_student: student._id });
+
+    if (status !== 'tidak hadir') {
+      const newAbsentDetail = new Absent_Detail({
+        id_absent,
+        id_student: student._id,
+        role: 'student',
+        status,
+      });
+
+      await newAbsentDetail.save();
+    }
+
+    res.sendStatus(204);
+  } catch (error) {
+    res.status(500).json({ message: error.message || 'Server error', error });
+  }
+};
+
+// untuk teacher absen pulang harus hadir terlebih dahulu
 export const updateDetailAbsentByNoInduk = async (req, res) => {
   const url = `${req.protocol}://${req.get('host')}/images`;
   const { id_absent } = req.params;

@@ -1,8 +1,9 @@
+import Swal from 'sweetalert2';
 import { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 
-import { Breadcrumbs, Input } from '../../components';
-import { getUserAbsent } from '../../fetchers/absent';
+import { Breadcrumbs, Input, Button } from '../../components';
+import { getUserAbsent, updateAbsentDetailStudent } from '../../fetchers/absent';
 
 const breadList = [
   { title: 'Beranda', href: '/' },
@@ -26,6 +27,50 @@ const Detail = () => {
 
     getAll();
   }, [queries, id]);
+
+  const updateStatus = (name, no_induk) => {
+    Swal.fire({
+      title: `Ubah status absen "${name}"`,
+      input: 'radio',
+      inputOptions: {
+        hadir: 'Hadir',
+        'tidak hadir': 'Tidak Hadir',
+        izin: 'Izin',
+        sakit: 'Sakit',
+      },
+      icon: 'question',
+      confirmButtonText: 'Ya, ubah!',
+      confirmButtonColor: '#287bff',
+      showDenyButton: true,
+      denyButtonText: 'Batal',
+      denyButtonColor: '#dc3545',
+      showLoaderOnConfirm: true,
+      preConfirm: (value) => {
+        if (!value) return Swal.showValidationMessage('Anda tidak memasukan pilihan...');
+
+        return (async () => {
+          try {
+            await updateAbsentDetailStudent(id, { no_induk, status: value });
+          } catch (error) {
+            Swal.showValidationMessage(error.response?.data?.message || error.message);
+            console.log(error);
+          }
+        })();
+      },
+      allowOutsideClick: () => !Swal.isLoading(),
+    }).then((res) => {
+      if (res.isConfirmed) {
+        setQueries({ role: 'student' });
+
+        Swal.fire({
+          icon: 'success',
+          title: `${name} berhasil diperbarui`,
+          timer: 1500,
+          showConfirmButton: false,
+        });
+      }
+    });
+  };
 
   return (
     <>
@@ -58,6 +103,7 @@ const Detail = () => {
                 <th className="whitespace-nowrap px-6">Kelas</th>
               )}
               <th className="whitespace-nowrap px-6">Status</th>
+              <th className="whitespace-nowrap px-6"></th>
             </tr>
           </thead>
 
@@ -82,6 +128,14 @@ const Detail = () => {
                     : student.status[0] === 'pending'
                     ? 'Tidak Absen Pulang'
                     : student.status[0]}
+                </td>
+
+                <td className="whitespace-nowrap px-6 text-right">
+                  <Button
+                    label="Ubah"
+                    outline
+                    onClick={() => updateStatus(student.full_name, student.no_induk)}
+                  />
                 </td>
               </tr>
             ))}

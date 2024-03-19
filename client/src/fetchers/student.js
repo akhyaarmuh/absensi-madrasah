@@ -17,6 +17,11 @@ export const getStudentById = async (id) => {
   return response.data.data;
 };
 
+export const getDetailAbsentStudentById = async (id) => {
+  const response = await axiosWT.get(`${rootPath}/${id}/absent-detail`);
+  return response.data.data;
+};
+
 export const updateStudentById = async (payload) => {
   const response = await axiosWT.patch(`${rootPath}/${payload._id}`, payload);
   return response.data;
