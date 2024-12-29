@@ -2,11 +2,20 @@ import Swal from 'sweetalert2';
 import { ImBoxAdd } from 'react-icons/im';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { BsArrowLeftShort, BsArrowRightShort } from 'react-icons/bs';
+import {
+  BsArrowLeftShort,
+  BsArrowRightShort,
+  BsTrashFill,
+} from 'react-icons/bs';
 
 import { toRupiah, parseDate } from '../../utilities';
 import { Breadcrumbs, Button } from '../../components';
-import { createAbsent, getAllAbsent, deleteAbsentById } from '../../fetchers/absent';
+import {
+  createAbsent,
+  getAllAbsent,
+  deleteAbsentById,
+  deleteAbsentByIds,
+} from '../../fetchers/absent';
 
 const breadList = [{ title: 'Beranda', href: '/' }, { title: 'Absen' }];
 
@@ -21,6 +30,9 @@ const displayTime = (date) => {
 
 const Absent = () => {
   const navigate = useNavigate();
+
+  const [selected, setSelected] = useState([]);
+
   const [absent, setAbsent] = useState({
     data: [],
     page: 0,
@@ -68,7 +80,9 @@ const Absent = () => {
           try {
             await deleteAbsentById(deleted._id);
           } catch (error) {
-            Swal.showValidationMessage(error.response?.data?.message || error.message);
+            Swal.showValidationMessage(
+              error.response?.data?.message || error.message
+            );
             console.log(error);
           }
         })();
@@ -109,7 +123,9 @@ const Absent = () => {
             const absent = await createAbsent();
             return absent;
           } catch (error) {
-            Swal.showValidationMessage(error.response?.data?.message || error.message);
+            Swal.showValidationMessage(
+              error.response?.data?.message || error.message
+            );
             console.log(error);
           }
         })();
@@ -133,6 +149,57 @@ const Absent = () => {
     });
   };
 
+  const handleChangeSelectAll = () => {
+    if (selected.length === absent.data.length) setSelected([]);
+    else setSelected(absent.data.map((v) => v._id));
+  };
+
+  const handleChangeSelect = (id) => {
+    if (selected.includes(id)) setSelected(selected.filter((v) => v !== id));
+    else setSelected([...selected, id]);
+  };
+
+  const handleDeleteSelected = () => {
+    Swal.fire({
+      title: `Hapus ${selected.length} absen yang dipilih?`,
+      text: `Anda yakin?`,
+      icon: 'question',
+      confirmButtonText: 'Ya, hapus!',
+      confirmButtonColor: '#287bff',
+      showDenyButton: true,
+      denyButtonText: 'Batal',
+      denyButtonColor: '#dc3545',
+      showLoaderOnConfirm: true,
+      preConfirm: () => {
+        return (async () => {
+          try {
+            await deleteAbsentByIds(selected);
+          } catch (error) {
+            Swal.showValidationMessage(
+              error.response?.data?.message || error.message
+            );
+            console.log(error);
+          }
+        })();
+      },
+      allowOutsideClick: () => !Swal.isLoading(),
+    }).then(async (res) => {
+      if (res.isConfirmed) {
+        const data = await getAllAbsent(queries);
+        setAbsent(data);
+
+        setSelected([]);
+
+        Swal.fire({
+          icon: 'success',
+          title: `Absen berhasil dihapus`,
+          timer: 1500,
+          showConfirmButton: false,
+        });
+      }
+    });
+  };
+
   return (
     <>
       <Breadcrumbs list={breadList} />
@@ -143,11 +210,33 @@ const Absent = () => {
         size="md"
         onClick={handleCreateAbsent}
       />
+      <span className="inline-block w-2" />
+      {selected.length > 0 && (
+        <Button
+          label="Hapus Absen yang Dipilih"
+          icon={<BsTrashFill className="text-lg" />}
+          type="danger"
+          size="md"
+          onClick={handleDeleteSelected}
+        />
+      )}
 
       <div className="my-5 overflow-x-auto">
         <table className="w-full table-auto text-left text-sm">
           <thead className="text-xs uppercase">
             <tr className="border-y">
+              <th className="whitespace-nowrap px-6 py-3">
+                <input
+                  type="checkbox"
+                  onChange={handleChangeSelectAll}
+                  checked={
+                    absent.data.length > 0 &&
+                    selected.length === absent.data.length
+                      ? true
+                      : false
+                  }
+                />
+              </th>
               <th className="whitespace-nowrap px-6 py-3">Tanggal</th>
               <th className="whitespace-nowrap px-6 py-3">Waktu</th>
               <th className="whitespace-nowrap px-6"></th>
@@ -157,20 +246,33 @@ const Absent = () => {
             {absent.data.map((absent, i) => (
               <tr
                 className={
-                  i % 2 === 1 ? 'border-y' : 'border-y bg-neutral-100 dark:bg-transparent'
+                  i % 2 === 1
+                    ? 'border-y'
+                    : 'border-y bg-neutral-100 dark:bg-transparent'
                 }
                 key={absent._id}
               >
                 <td className="whitespace-nowrap px-6 py-3">
+                  <input
+                    type="checkbox"
+                    checked={selected.includes(absent._id)}
+                    onChange={() => handleChangeSelect(absent._id)}
+                  />
+                </td>
+                <td className="whitespace-nowrap px-6 py-3">
                   {displayDate(absent.date)}
                 </td>
-                <td className="whitespace-nowrap px-6">{displayTime(absent.date)}</td>
+                <td className="whitespace-nowrap px-6">
+                  {displayTime(absent.date)}
+                </td>
                 <td className="whitespace-nowrap px-6 text-right">
                   <Button
                     label="Absen Santri"
                     outline
                     onClick={() =>
-                      navigate(`/absent/${absent._id}/student`, { state: absent })
+                      navigate(`/absent/${absent._id}/student`, {
+                        state: absent,
+                      })
                     }
                   />
                   <span className="inline-block w-1"></span>
@@ -178,7 +280,9 @@ const Absent = () => {
                     label="Absen Mudaris"
                     outline
                     onClick={() =>
-                      navigate(`/absent/${absent._id}/teacher`, { state: absent })
+                      navigate(`/absent/${absent._id}/teacher`, {
+                        state: absent,
+                      })
                     }
                   />
                   <span className="inline-block w-1"></span>
@@ -187,7 +291,9 @@ const Absent = () => {
                     type="success"
                     outline
                     onClick={() =>
-                      navigate(`/absent/${absent._id}/detail`, { state: absent })
+                      navigate(`/absent/${absent._id}/detail`, {
+                        state: absent,
+                      })
                     }
                   />
                   <span className="inline-block w-1"></span>
@@ -210,7 +316,8 @@ const Absent = () => {
       {absent.rows > 0 && (
         <>
           <p>
-            Halaman: {toRupiah(absent.page + 1)} dari {toRupiah(absent.allPage)} halaman.
+            Halaman: {toRupiah(absent.page + 1)} dari {toRupiah(absent.allPage)}{' '}
+            halaman.
           </p>
 
           <div className="flex justify-end gap-x-2">
@@ -220,7 +327,9 @@ const Absent = () => {
                 icon={<BsArrowLeftShort className="text-xl" />}
                 outline
                 disabled={getting}
-                onClick={() => setQueries({ ...queries, page: absent.page - 1 })}
+                onClick={() =>
+                  setQueries({ ...queries, page: absent.page - 1 })
+                }
               />
             )}
 
@@ -231,7 +340,9 @@ const Absent = () => {
                 reverse
                 outline
                 disabled={getting}
-                onClick={() => setQueries({ ...queries, page: absent.page + 1 })}
+                onClick={() =>
+                  setQueries({ ...queries, page: absent.page + 1 })
+                }
               />
             )}
           </div>

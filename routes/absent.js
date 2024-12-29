@@ -4,6 +4,7 @@ import {
   createAbsent,
   getAllAbsent,
   deleteAbsentById,
+  deleteAbsentByIds,
   createDetailAbsent,
   getUserAbsent,
   updateAbsentDetailStudent,
@@ -15,10 +16,19 @@ const route = express.Router();
 route.post('/', verifyAccessToken, createAbsent);
 route.get('/', verifyAccessToken, getAllAbsent);
 route.delete('/:id', verifyAccessToken, deleteAbsentById);
+route.delete('/', verifyAccessToken, deleteAbsentByIds);
 
 route.post('/detail/:id_absent', verifyAccessToken, createDetailAbsent);
 route.get('/detail/:id_absent', getUserAbsent);
-route.patch('/detail/:id_absent', verifyAccessToken, updateDetailAbsentByNoInduk);
-route.patch('/detail/:id_absent/student', verifyAccessToken, updateAbsentDetailStudent);
+route.patch(
+  '/detail/:id_absent',
+  verifyAccessToken,
+  updateDetailAbsentByNoInduk
+);
+route.patch(
+  '/detail/:id_absent/student',
+  verifyAccessToken,
+  updateAbsentDetailStudent
+);
 
 export default route;

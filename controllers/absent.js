@@ -18,14 +18,17 @@ export const createAbsent = async (req, res) => {
     const newAbsent = new Absent();
     await newAbsent.save();
 
-    res.status(201).json({ data: newAbsent, message: 'Buku absent berhasil dibuat' });
+    res
+      .status(201)
+      .json({ data: newAbsent, message: 'Buku absent berhasil dibuat' });
   } catch (error) {
     if (error.name === 'ValidationError')
       res.status(400).json({
         message: error.message || 'Data tidak benar',
         error: errorValidation(error),
       });
-    else res.status(500).json({ message: error.message || 'Server error', error });
+    else
+      res.status(500).json({ message: error.message || 'Server error', error });
   }
 };
 
@@ -62,6 +65,22 @@ export const deleteAbsentById = async (req, res) => {
   }
 };
 
+export const deleteAbsentByIds = async (req, res) => {
+  const { ids } = req.body;
+
+  try {
+    for (let i = 0; i < ids.length; i++) {
+      const id = ids[i];
+
+      await Absent.deleteOne({ _id: id }).exec();
+    }
+
+    res.sendStatus(204);
+  } catch (error) {
+    res.status(500).json({ message: error.message || 'Server error', error });
+  }
+};
+
 // detail absent
 export const createDetailAbsent = async (req, res) => {
   const url = `${req.protocol}://${req.get('host')}/images`;
@@ -79,7 +98,8 @@ export const createDetailAbsent = async (req, res) => {
       throw new Error('wrong role link');
     }
 
-    if (!user) return res.status(404).json({ message: 'Pengguna tidak ditemukan' });
+    if (!user)
+      return res.status(404).json({ message: 'Pengguna tidak ditemukan' });
 
     if (role === 'student') {
       newAbsentDetail = new Absent_Detail({
@@ -109,7 +129,8 @@ export const createDetailAbsent = async (req, res) => {
         message: error.message || 'Data tidak benar',
         error: errorValidation(error),
       });
-    else res.status(500).json({ message: error.message || 'Server error', error });
+    else
+      res.status(500).json({ message: error.message || 'Server error', error });
   }
 };
 
@@ -194,7 +215,9 @@ export const getUserAbsent = async (req, res) => {
         },
       ]).exec();
     } else {
-      return res.status(400).json({ message: 'Anda tidak mengirimkan role query' });
+      return res
+        .status(400)
+        .json({ message: 'Anda tidak mengirimkan role query' });
     }
 
     res.json({ data, rows: data.length });
@@ -236,27 +259,35 @@ export const updateDetailAbsentByNoInduk = async (req, res) => {
 
   try {
     const user = await Teacher.findOne({ no_induk }).exec();
-    if (!user) return res.status(404).json({ message: 'Pengguna tidak ditemukan' });
+    if (!user)
+      return res.status(404).json({ message: 'Pengguna tidak ditemukan' });
 
     const absent_hadir = await Absent_Detail.findOne({
       id_absent,
       id_teacher: user._id,
     }).exec();
     if (!absent_hadir)
-      return res.status(404).json({ message: 'Anda belum melakukan absen hadir' });
+      return res
+        .status(404)
+        .json({ message: 'Anda belum melakukan absen hadir' });
     if (absent_hadir.out)
-      return res.status(404).json({ message: 'Anda sudah melakukan absen pulang' });
+      return res
+        .status(404)
+        .json({ message: 'Anda sudah melakukan absen pulang' });
 
     const now = new Date();
     const _in = new Date(absent_hadir.in);
     const status =
-      now.getTime() > _in.getTime() + minimal_hadir * 60000 ? 'hadir' : 'lebih awal';
+      now.getTime() > _in.getTime() + minimal_hadir * 60000
+        ? 'hadir'
+        : 'lebih awal';
 
     await Absent_Detail.findOneAndUpdate(
       { _id: absent_hadir._id },
       {
         out: now,
-        status: absent_hadir.status === 'pending' ? status : absent_hadir.status,
+        status:
+          absent_hadir.status === 'pending' ? status : absent_hadir.status,
       }
     );
 
@@ -267,6 +298,7 @@ export const updateDetailAbsentByNoInduk = async (req, res) => {
         message: error.message || 'Data tidak benar',
         error: errorValidation(error),
       });
-    else res.status(500).json({ message: error.message || 'Server error', error });
+    else
+      res.status(500).json({ message: error.message || 'Server error', error });
   }
 };

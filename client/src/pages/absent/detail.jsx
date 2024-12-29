@@ -1,9 +1,12 @@
 import Swal from 'sweetalert2';
 import { useEffect, useState } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, Link } from 'react-router-dom';
 
 import { Breadcrumbs, Input, Button } from '../../components';
-import { getUserAbsent, updateAbsentDetailStudent } from '../../fetchers/absent';
+import {
+  getUserAbsent,
+  updateAbsentDetailStudent,
+} from '../../fetchers/absent';
 
 const breadList = [
   { title: 'Beranda', href: '/' },
@@ -46,13 +49,16 @@ const Detail = () => {
       denyButtonColor: '#dc3545',
       showLoaderOnConfirm: true,
       preConfirm: (value) => {
-        if (!value) return Swal.showValidationMessage('Anda tidak memasukan pilihan...');
+        if (!value)
+          return Swal.showValidationMessage('Anda tidak memasukan pilihan...');
 
         return (async () => {
           try {
             await updateAbsentDetailStudent(id, { no_induk, status: value });
           } catch (error) {
-            Swal.showValidationMessage(error.response?.data?.message || error.message);
+            Swal.showValidationMessage(
+              error.response?.data?.message || error.message
+            );
             console.log(error);
           }
         })();
@@ -111,16 +117,30 @@ const Detail = () => {
             {data.map((student, i) => (
               <tr
                 className={
-                  i % 2 === 1 ? 'border-y' : 'border-y bg-neutral-100 dark:bg-transparent'
+                  i % 2 === 1
+                    ? 'border-y'
+                    : 'border-y bg-neutral-100 dark:bg-transparent'
                 }
                 key={student._id}
               >
-                <td className="whitespace-nowrap px-6 py-3">{student.no_induk}</td>
+                <td className="whitespace-nowrap px-6 py-3 text-primary">
+                  <Link
+                    className="cursor-pointer hover:underline dark:font-bold"
+                    target="_blank"
+                    to={`/student?no_induk=${student.no_induk}`}
+                  >
+                    {student.no_induk}
+                  </Link>
+                </td>
                 <td className="whitespace-nowrap px-6">{student.full_name}</td>
-                <td className="whitespace-nowrap px-6">{student.parent_name}</td>
+                <td className="whitespace-nowrap px-6">
+                  {student.parent_name}
+                </td>
                 <td className="whitespace-nowrap px-6">{student.address}</td>
                 {queries.role === 'student' && (
-                  <td className="whitespace-nowrap px-6">{student.classroom?.name}</td>
+                  <td className="whitespace-nowrap px-6">
+                    {student.classroom?.name}
+                  </td>
                 )}
                 <td className="whitespace-nowrap px-6">
                   {!student.status[0]
@@ -134,7 +154,9 @@ const Detail = () => {
                   <Button
                     label="Ubah"
                     outline
-                    onClick={() => updateStatus(student.full_name, student.no_induk)}
+                    onClick={() =>
+                      updateStatus(student.full_name, student.no_induk)
+                    }
                   />
                 </td>
               </tr>
